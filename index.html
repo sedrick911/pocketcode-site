@@ -17,7 +17,7 @@
       <div class="top-actions">
         <span class="save-status" id="saveStatus" role="status">Saved locally</span>
         <button class="icon-button download-button" id="downloadButton" type="button" aria-label="Download current file" title="Download current file">↓</button>
-        <button class="run-button" id="runButton" type="button"><span aria-hidden="true">▶</span><span>Run</span></button>
+        <button class="run-button" id="runButton" type="button" title="Run an HTML/CSS/JavaScript preview"><span aria-hidden="true">▶</span><span>Run</span></button>
       </div>
     </header>
 
@@ -31,7 +31,7 @@
         <div class="sidebar-heading"><span>EXPLORER</span><button class="small-icon-button" id="newFileButton" type="button" aria-label="New file" title="New file">＋</button></div>
         <button class="project-row" type="button"><span>⌄</span><strong>MY-PROJECT</strong></button>
         <div class="file-list" id="fileList" aria-label="Project files"></div>
-        <div class="sidebar-help">Your files stay in this browser.<br>Download files to keep a copy.</div>
+        <div class="sidebar-help">Choose a language below. Files save in this browser.<br>Run preview supports HTML, CSS, and JavaScript.</div>
       </aside>
 
       <section class="editor-column" id="editorColumn" aria-label="Code editor">
@@ -41,7 +41,7 @@
           <div class="line-numbers" id="lineNumbers" aria-hidden="true">1</div>
           <textarea id="codeInput" aria-label="Code editor" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" wrap="off" placeholder="Start typing code..."></textarea>
         </div>
-        <div class="editor-footer"><span id="languageLabel">HTML</span><span>UTF-8</span><span>Spaces: 2</span><span id="cursorPosition">Ln 1, Col 1</span></div>
+        <div class="editor-footer"><label class="visually-hidden" for="languageSelect">Programming language</label><select id="languageSelect" aria-label="Programming language" title="Choose the current file language"></select><span>UTF-8</span><span>Spaces: 2</span><span id="cursorPosition">Ln 1, Col 1</span></div>
       </section>
 
       <section class="preview-column" id="previewColumn" aria-label="Live preview">

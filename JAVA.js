@@ -2,6 +2,58 @@
   'use strict';
 
   const storageKey = 'pocketcode.project.v1';
+  const languageOptions = [
+    ['Plain Text', 'txt'],
+    ['ABAP', 'abap'], ['ActionScript', 'as'], ['Ada', 'ada'], ['Agda', 'agda'],
+    ['ALGOL', 'alg'], ['Alice', 'alice'], ['Apex', 'cls'], ['APL', 'apl'],
+    ['AppleScript', 'applescript'], ['Arc', 'arc'], ['Arduino', 'ino'],
+    ['Assembly', 'asm'], ['AutoHotkey', 'ahk'], ['AutoIt', 'au3'], ['AWK', 'awk'],
+    ['B', 'b'], ['Ballerina', 'bal'], ['Bash', 'sh'], ['BASIC', 'bas'],
+    ['Batch', 'bat'], ['BCPL', 'bcpl'], ['Befunge', 'bf'], ['BlitzMax', 'bmx'],
+    ['Boo', 'boo'], ['Brainfuck', 'brainfuck'], ['C', 'c'], ['C#', 'cs'],
+    ['C++', 'cpp'], ['Carbon', 'carbon'], ['Ceylon', 'ceylon'], ['Chapel', 'chpl'],
+    ['Clojure', 'clj'], ['CLU', 'clu'], ['COBOL', 'cob'], ['CoffeeScript', 'coffee'],
+    ['ColdFusion', 'cfm'], ['Common Lisp', 'lisp'], ['Coq', 'v'], ['Crystal', 'cr'],
+    ['CSS', 'css'], ['CUDA', 'cu'], ['Curl', 'curl'], ['Cython', 'pyx'],
+    ['D', 'd'], ['Dart', 'dart'], ['Delphi', 'pas'], ['Dhall', 'dhall'],
+    ['Dylan', 'dylan'], ['Eiffel', 'e'], ['Elixir', 'ex'], ['Elm', 'elm'],
+    ['Emacs Lisp', 'el'], ['Erlang', 'erl'], ['Euphoria', 'euphoria'], ['F#', 'fs'],
+    ['Factor', 'factor'], ['Falcon', 'fal'], ['Fantom', 'fan'], ['Forth', 'fth'],
+    ['Fortran', 'f90'], ['FoxPro', 'prg'], ['GAMS', 'gms'], ['GDScript', 'gd'],
+    ['GLSL', 'glsl'], ['Go', 'go'], ['Gosu', 'gs'], ['GraphQL', 'graphql'],
+    ['Groovy', 'groovy'], ['Hack', 'hack'], ['Haskell', 'hs'], ['Haxe', 'hx'],
+    ['HLSL', 'hlsl'], ['HTML', 'html'], ['HyperTalk', 'htalk'], ['Icon', 'icn'],
+    ['IDL', 'idl'], ['Idris', 'idr'], ['Inform', 'inf'], ['Io', 'io'],
+    ['J', 'j'], ['J#', 'jsharp'], ['JADE', 'jade'], ['Java', 'java'],
+    ['JavaScript', 'js'], ['JScript', 'jscript'], ['Julia', 'jl'], ['Kotlin', 'kt'],
+    ['LabVIEW', 'lvproj'], ['Ladder Logic', 'ld'], ['Lasso', 'lass'], ['Lean', 'lean'],
+    ['Lisp', 'lisp'], ['LiveCode', 'livecode'], ['Logo', 'logo'], ['Lua', 'lua'],
+    ['M4', 'm4'], ['Maple', 'mpl'], ['MATLAB', 'm'], ['Max', 'maxpat'],
+    ['Mercury', 'mrc'], ['Miranda', 'mira'], ['ML', 'ml'], ['Modula-2', 'mod'],
+    ['Modula-3', 'm3'], ['Mojo', 'mojo'], ['MUMPS', 'mumps'], ['Nemerle', 'n'],
+    ['Nim', 'nim'], ['Nix', 'nix'], ['Objective-C', 'm'], ['OCaml', 'ml'],
+    ['Occam', 'occ'], ['Odin', 'odin'], ['OpenCL', 'cl'], ['OpenEdge ABL', 'p'],
+    ['Oz', 'oz'], ['Pascal', 'pas'], ['Perl', 'pl'], ['PHP', 'php'],
+    ['PicoLisp', 'l'], ['Pike', 'pike'], ['PL/I', 'pli'], ['PL/SQL', 'pks'],
+    ['Pony', 'pony'], ['PostScript', 'ps'], ['PowerShell', 'ps1'], ['Processing', 'pde'],
+    ['Prolog', 'pro'], ['PureScript', 'purs'], ['Python', 'py'], ['Q', 'q'],
+    ['Q#', 'qs'], ['R', 'r'], ['Racket', 'rkt'], ['Raku', 'raku'],
+    ['REBOL', 'r'], ['Red', 'red'], ['Rexx', 'rex'], ['Ring', 'ring'],
+    ['RPG', 'rpgle'], ['Ruby', 'rb'], ['Rust', 'rs'], ['SAS', 'sas'],
+    ['Scala', 'scala'], ['Scheme', 'scm'], ['Scratch', 'sb3'], ['Sed', 'sed'],
+    ['Seed7', 'sd7'], ['Self', 'self'], ['Shell', 'sh'], ['Simula', 'sim'],
+    ['Smalltalk', 'st'], ['SNOBOL', 'sno'], ['Solidity', 'sol'], ['SPARK', 'sp'],
+    ['SQL', 'sql'], ['Squirrel', 'nut'], ['Standard ML', 'sml'], ['Stata', 'do'],
+    ['Swift', 'swift'], ['Tcl', 'tcl'], ['TeX', 'tex'], ['TypeScript', 'ts'],
+    ['Vala', 'vala'], ['VBScript', 'vbs'], ['Verilog', 'v'], ['VHDL', 'vhd'],
+    ['Vimscript', 'vim'], ['Visual Basic', 'vb'], ['Visual Basic .NET', 'vb'],
+    ['WebAssembly', 'wasm'], ['Wolfram', 'wl'], ['X10', 'x10'], ['Xojo', 'xojo_code'],
+    ['XQuery', 'xq'], ['XSLT', 'xslt'], ['Yacc', 'y'], ['Zig', 'zig']
+  ];
+  const extensionsByLanguage = {};
+  languageOptions.forEach(function (option) {
+    extensionsByLanguage[option[0]] = option[1];
+  });
   const starterFiles = {
     'index.html': '<!doctype html>\n<html lang="en">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>My first page</title>\n</head>\n<body>\n  <main class="card">\n    <span class="spark">✦</span>\n    <p class="eyebrow">YOUR SPACE ON THE WEB</p>\n    <h1>Hello, <span>world.</span></h1>\n    <p class="intro">A little idea, made real. Change the code and press Run to see it here.</p>\n    <button id="helloButton">Try me</button>\n    <p id="message" aria-live="polite"></p>\n  </main>\n</body>\n</html>',
     'style.css': 'body {\n  min-height: 100vh;\n  margin: 0;\n  display: grid;\n  place-items: center;\n  background: #f4f3ed;\n  color: #202722;\n  font-family: system-ui, sans-serif;\n}\n.card {\n  position: relative;\n  width: min(390px, calc(100% - 48px));\n  padding: 38px;\n  border: 1px solid #e3e2d9;\n  border-radius: 20px;\n  background: white;\n  box-shadow: 0 18px 50px #20272212;\n}\n.spark { color: #4c946b; font-size: 25px; }\n.eyebrow { margin-top: 22px; color: #668170; font-size: 11px; letter-spacing: 1.5px; }\nh1 { margin: 8px 0; font-size: 42px; letter-spacing: -2px; }\nh1 span { color: #4c946b; }\n.intro { color: #68716b; line-height: 1.7; }\nbutton { margin-top: 12px; padding: 11px 17px; border: 0; border-radius: 8px; background: #315d43; color: white; font: inherit; cursor: pointer; }\n#message { min-height: 24px; color: #315d43; }',
@@ -21,36 +73,54 @@
   const previewToggle = document.getElementById('previewToggle');
   const currentFileLabel = document.getElementById('currentFileLabel');
   const statusFile = document.getElementById('statusFile');
-  const languageLabel = document.getElementById('languageLabel');
+  const languageSelect = document.getElementById('languageSelect');
   const cursorPosition = document.getElementById('cursorPosition');
-  let files = loadFiles();
+  const project = loadProject();
+  let files = project.files;
+  let fileLanguages = project.languages;
   let currentFile = Object.keys(files)[0] || 'index.html';
   let saveTimer;
   let toastTimer;
 
-  if (!files[currentFile]) {
+  if (!Object.prototype.hasOwnProperty.call(files, currentFile)) {
     files = Object.assign({}, starterFiles);
     currentFile = 'index.html';
+    fileLanguages = {};
   }
 
-  function loadFiles() {
+  function loadProject() {
     try {
       const saved = localStorage.getItem(storageKey);
-      if (!saved) return Object.assign({}, starterFiles);
+      if (!saved) return { files: Object.assign({}, starterFiles), languages: {} };
       const parsed = JSON.parse(saved);
-      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) || !Object.keys(parsed).length) {
-        return Object.assign({}, starterFiles);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return { files: Object.assign({}, starterFiles), languages: {} };
       }
+      const sourceFiles = parsed.files && typeof parsed.files === 'object' && !Array.isArray(parsed.files)
+        ? parsed.files
+        : parsed;
+      const sourceLanguages = parsed.languages && typeof parsed.languages === 'object' && !Array.isArray(parsed.languages)
+        ? parsed.languages
+        : {};
       const validFiles = {};
-      Object.keys(parsed).forEach(function (name) {
-        if (typeof parsed[name] === 'string') validFiles[name] = parsed[name];
+      Object.keys(sourceFiles).forEach(function (name) {
+        if (typeof sourceFiles[name] === 'string') validFiles[name] = sourceFiles[name];
       });
-      return Object.keys(validFiles).length ? validFiles : Object.assign({}, starterFiles);
+      const validLanguages = {};
+      Object.keys(sourceLanguages).forEach(function (name) {
+        if (Object.prototype.hasOwnProperty.call(validFiles, name) &&
+            Object.prototype.hasOwnProperty.call(extensionsByLanguage, sourceLanguages[name])) {
+          validLanguages[name] = sourceLanguages[name];
+        }
+      });
+      return Object.keys(validFiles).length
+        ? { files: validFiles, languages: validLanguages }
+        : { files: Object.assign({}, starterFiles), languages: {} };
     } catch (error) {
       console.error('Could not read the saved PocketCode project.', error);
       saveStatus.textContent = 'Using starter files';
       showToast('Saved project data could not be read. Opened the starter files instead.');
-      return Object.assign({}, starterFiles);
+      return { files: Object.assign({}, starterFiles), languages: {} };
     }
   }
 
@@ -68,7 +138,7 @@
     window.clearTimeout(saveTimer);
     saveTimer = window.setTimeout(function () {
       try {
-        localStorage.setItem(storageKey, JSON.stringify(files));
+        localStorage.setItem(storageKey, JSON.stringify({ files: files, languages: fileLanguages }));
         saveStatus.textContent = 'Saved locally';
       } catch (error) {
         saveStatus.textContent = 'Save failed';
@@ -80,6 +150,24 @@
   function getExtension(name) {
     const dot = name.lastIndexOf('.');
     return dot < 0 ? '' : name.slice(dot + 1).toLowerCase();
+  }
+
+  function getLanguageForFile(name) {
+    if (fileLanguages[name]) return fileLanguages[name];
+    const extension = getExtension(name);
+    const match = languageOptions.find(function (option) {
+      return option[1] === extension;
+    });
+    return match ? match[0] : 'Plain Text';
+  }
+
+  function populateLanguageOptions() {
+    languageOptions.forEach(function (language) {
+      const option = document.createElement('option');
+      option.value = language[0];
+      option.textContent = language[0];
+      languageSelect.appendChild(option);
+    });
   }
 
   function getFileIconClass(name) {
@@ -138,8 +226,7 @@
     codeInput.value = files[name];
     currentFileLabel.textContent = name;
     statusFile.textContent = name;
-    const extension = getExtension(name);
-    languageLabel.textContent = extension ? extension.toUpperCase() : 'PLAIN TEXT';
+    languageSelect.value = getLanguageForFile(name);
     renderLineNumbers();
     renderFileButtons();
     renderTabs();
@@ -165,6 +252,11 @@
   }
 
   function runPreview(showPreview) {
+    const language = getLanguageForFile(currentFile);
+    if (language !== 'HTML' && language !== 'CSS' && language !== 'JavaScript') {
+      showToast(language + ' code can be edited and downloaded; Run preview supports HTML, CSS, and JavaScript.');
+      return;
+    }
     const htmlName = Object.keys(files).find(function (name) {
       return getExtension(name) === 'html';
     });
@@ -223,9 +315,37 @@
       return;
     }
     files[cleanName] = '';
+    fileLanguages[cleanName] = getLanguageForFile(cleanName);
     saveFiles();
     selectFile(cleanName);
     showToast('Created ' + cleanName);
+  }
+
+  function changeLanguage() {
+    const language = languageSelect.value;
+    const extension = extensionsByLanguage[language];
+    const dot = currentFile.lastIndexOf('.');
+    const baseName = dot > 0 ? currentFile.slice(0, dot) : currentFile;
+    const newName = baseName + '.' + extension;
+
+    if (newName !== currentFile && Object.prototype.hasOwnProperty.call(files, newName)) {
+      showToast('A file named ' + newName + ' already exists.');
+      languageSelect.value = getLanguageForFile(currentFile);
+      return;
+    }
+    if (newName !== currentFile) {
+      const renamedFiles = {};
+      Object.keys(files).forEach(function (name) {
+        renamedFiles[name === currentFile ? newName : name] = files[name];
+      });
+      files = renamedFiles;
+      delete fileLanguages[currentFile];
+      currentFile = newName;
+    }
+    fileLanguages[currentFile] = language;
+    saveFiles();
+    selectFile(currentFile);
+    showToast('Language set to ' + language + '.');
   }
 
   function deleteCurrentFile() {
@@ -236,6 +356,7 @@
     }
     if (!window.confirm('Delete ' + currentFile + ' from this browser project?')) return;
     delete files[currentFile];
+    delete fileLanguages[currentFile];
     currentFile = Object.keys(files)[0];
     saveFiles();
     selectFile(currentFile);
@@ -263,7 +384,7 @@
       event.preventDefault();
       window.clearTimeout(saveTimer);
       try {
-        localStorage.setItem(storageKey, JSON.stringify(files));
+        localStorage.setItem(storageKey, JSON.stringify({ files: files, languages: fileLanguages }));
         saveStatus.textContent = 'Saved locally';
         showToast('Project saved in this browser.');
       } catch (error) {
@@ -306,7 +427,9 @@
   document.getElementById('tabDownloadButton').addEventListener('click', downloadCurrentFile);
   document.getElementById('newFileButton').addEventListener('click', addFile);
   document.getElementById('deleteFileButton').addEventListener('click', deleteCurrentFile);
+  languageSelect.addEventListener('change', changeLanguage);
 
+  populateLanguageOptions();
   renderFileButtons();
   selectFile(currentFile);
   runPreview(false);
