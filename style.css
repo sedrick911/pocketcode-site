@@ -120,6 +120,10 @@ button { color: inherit; }
 .mobile-code-button { display: none; padding: 5px 8px; border: 1px solid #d5d9e0; border-radius: 4px; background: white; color: #555d69; font-size: 11px; cursor: pointer; }
 .preview-dot { width: 6px; height: 6px; background: #4caa7c; }
 #previewFrame { width: 100%; height: 100%; flex: 1; border: 0; background: white; }
+#previewFrame[hidden], .python-output[hidden] { display: none; }
+.python-output { width: 100%; height: 100%; flex: 1; overflow: auto; margin: 0; padding: 18px; background: #111318; color: #d7dae1; font: 13px/1.6 Consolas, "SFMono-Regular", Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.python-runner { position: fixed; left: -10000px; width: 1px; height: 1px; border: 0; opacity: 0; pointer-events: none; }
+.run-button:disabled { opacity: .65; cursor: wait; }
 .statusbar { height: 23px; flex: 0 0 23px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; background: #285d46; color: #f0fff6; font-size: 10px; }
 .statusbar > span:first-child { display: flex; align-items: center; gap: 5px; }
 .statusbar-check { font-style: normal; font-size: 12px; }

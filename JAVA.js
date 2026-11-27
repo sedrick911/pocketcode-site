@@ -59,6 +59,49 @@
     'style.css': 'body {\n  min-height: 100vh;\n  margin: 0;\n  display: grid;\n  place-items: center;\n  background: #f4f3ed;\n  color: #202722;\n  font-family: system-ui, sans-serif;\n}\n.card {\n  position: relative;\n  width: min(390px, calc(100% - 48px));\n  padding: 38px;\n  border: 1px solid #e3e2d9;\n  border-radius: 20px;\n  background: white;\n  box-shadow: 0 18px 50px #20272212;\n}\n.spark { color: #4c946b; font-size: 25px; }\n.eyebrow { margin-top: 22px; color: #668170; font-size: 11px; letter-spacing: 1.5px; }\nh1 { margin: 8px 0; font-size: 42px; letter-spacing: -2px; }\nh1 span { color: #4c946b; }\n.intro { color: #68716b; line-height: 1.7; }\nbutton { margin-top: 12px; padding: 11px 17px; border: 0; border-radius: 8px; background: #315d43; color: white; font: inherit; cursor: pointer; }\n#message { min-height: 24px; color: #315d43; }',
     'script.js': 'document.getElementById("helloButton").addEventListener("click", function () {\n  document.getElementById("message").textContent = "Nice! Your JavaScript is working.";\n});'
   };
+  const pythonRunnerSource = `<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>PocketCode Python runner</title></head>
+<body>
+<script type="module">
+  'use strict';
+  const pyodideBase = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
+  let runtime;
+  function send(message) {
+    window.parent.postMessage(message, '*');
+  }
+  window.addEventListener('message', async function (event) {
+    if (event.source !== window.parent || !event.data) return;
+    if (event.data.type === 'ping') {
+      send({ type: 'ready' });
+      return;
+    }
+    if (event.data.type !== 'run-python') return;
+    const requestId = event.data.requestId;
+    send({ type: 'status', requestId: requestId, text: 'Loading Python runtime… (first run may take a moment)' });
+    try {
+      if (!runtime) {
+        const module = await import(pyodideBase + 'pyodide.mjs');
+        runtime = await module.loadPyodide({ indexURL: pyodideBase });
+      }
+      const output = [];
+      runtime.setStdout({ batched: function (line) { output.push(line); } });
+      runtime.setStderr({ batched: function (line) { output.push(line); } });
+      const result = await runtime.runPythonAsync(event.data.code);
+      if (result !== undefined && result !== null) output.push(String(result));
+      send({
+        type: 'complete',
+        requestId: requestId,
+        output: output.join('\\n') || 'Program finished with no output.'
+      });
+    } catch (error) {
+      send({ type: 'error', requestId: requestId, output: String(error) });
+    }
+  });
+  send({ type: 'ready' });
+</script>
+</body>
+</html>`;
 
   const workbench = document.querySelector('.workbench');
   const sidebar = document.getElementById('fileSidebar');
@@ -69,6 +112,10 @@
   const saveStatus = document.getElementById('saveStatus');
   const toast = document.getElementById('toast');
   const previewFrame = document.getElementById('previewFrame');
+  const pythonOutput = document.getElementById('pythonOutput');
+  const pythonRunner = document.getElementById('pythonRunner');
+  const previewTitle = document.getElementById('previewTitle');
+  const runButton = document.getElementById('runButton');
   const filesToggle = document.getElementById('filesToggle');
   const previewToggle = document.getElementById('previewToggle');
   const currentFileLabel = document.getElementById('currentFileLabel');
@@ -81,6 +128,11 @@
   let currentFile = Object.keys(files)[0] || 'index.html';
   let saveTimer;
   let toastTimer;
+  let pythonRuntimeReady = false;
+  let pythonRunning = false;
+  let pythonRunId = 0;
+  let pythonPendingRun = null;
+  const pythonReadyWaiters = [];
 
   if (!Object.prototype.hasOwnProperty.call(files, currentFile)) {
     files = Object.assign({}, starterFiles);
@@ -251,12 +303,89 @@
     return window.btoa(binary);
   }
 
-  function runPreview(showPreview) {
-    const language = getLanguageForFile(currentFile);
-    if (language !== 'HTML' && language !== 'CSS' && language !== 'JavaScript') {
-      showToast(language + ' code can be edited and downloaded; Run preview supports HTML, CSS, and JavaScript.');
+  function handlePythonMessage(event) {
+    if (event.source !== pythonRunner.contentWindow || !event.data || typeof event.data !== 'object') return;
+    const message = event.data;
+    if (message.type === 'ready') {
+      pythonRuntimeReady = true;
+      pythonReadyWaiters.splice(0).forEach(function (resolve) { resolve(); });
       return;
     }
+    if (!pythonPendingRun || message.requestId !== pythonPendingRun.id) return;
+    if (message.type === 'status') {
+      pythonOutput.textContent = message.text;
+    } else if (message.type === 'complete' || message.type === 'error') {
+      pythonOutput.textContent = message.output;
+      pythonPendingRun.resolve();
+      pythonPendingRun = null;
+    }
+  }
+
+  function waitForPythonRunner() {
+    if (pythonRuntimeReady) return Promise.resolve();
+    return new Promise(function (resolve, reject) {
+      const timeout = window.setTimeout(function () {
+        const index = pythonReadyWaiters.indexOf(onReady);
+        if (index >= 0) pythonReadyWaiters.splice(index, 1);
+        reject(new Error('The isolated Python runner did not start. Reload the page and try again.'));
+      }, 10000);
+      function onReady() {
+        window.clearTimeout(timeout);
+        resolve();
+      }
+      pythonReadyWaiters.push(onReady);
+      pythonRunner.contentWindow.postMessage({ type: 'ping' }, '*');
+    });
+  }
+
+  async function runPython(showPreview) {
+    if (pythonRunning) {
+      showToast('Python is already running.');
+      return;
+    }
+    pythonRunning = true;
+    runButton.disabled = true;
+    pythonOutput.hidden = false;
+    previewFrame.hidden = true;
+    previewTitle.textContent = 'OUTPUT';
+    pythonOutput.textContent = 'Starting the Python runtime…';
+    if (showPreview && window.matchMedia('(max-width: 760px)').matches) {
+      workbench.classList.add('preview-open');
+      previewToggle.classList.add('selected');
+    }
+    try {
+      await waitForPythonRunner();
+      const requestId = ++pythonRunId;
+      await new Promise(function (resolve, reject) {
+        pythonPendingRun = { id: requestId, resolve: resolve, reject: reject };
+        pythonRunner.contentWindow.postMessage({
+          type: 'run-python',
+          requestId: requestId,
+          code: codeInput.value
+        }, '*');
+      });
+    } catch (error) {
+      pythonOutput.textContent = 'Python could not run:\n' + String(error);
+      showToast('Python could not run. See Output for details.');
+    } finally {
+      pythonRunning = false;
+      runButton.disabled = false;
+    }
+  }
+
+  function runPreview(showPreview) {
+    const language = getLanguageForFile(currentFile);
+    if (language === 'Python') {
+      runPython(showPreview);
+      return;
+    }
+    if (language !== 'HTML' && language !== 'CSS' && language !== 'JavaScript') {
+      showToast(language + ' can be edited and downloaded; Run supports Python, HTML, CSS, and JavaScript.');
+      return;
+    }
+    pythonOutput.hidden = true;
+    previewFrame.hidden = false;
+    previewTitle.textContent = 'PREVIEW';
     const htmlName = Object.keys(files).find(function (name) {
       return getExtension(name) === 'html';
     });
@@ -417,7 +546,9 @@
     sidebar.classList.remove('open');
     filesToggle.setAttribute('aria-expanded', 'false');
   });
-  document.getElementById('runButton').addEventListener('click', function () { runPreview(true); });
+  window.addEventListener('message', handlePythonMessage);
+  pythonRunner.srcdoc = pythonRunnerSource;
+  runButton.addEventListener('click', function () { runPreview(true); });
   document.getElementById('refreshPreviewButton').addEventListener('click', function () { runPreview(true); });
   document.getElementById('backToEditorButton').addEventListener('click', function () {
     workbench.classList.remove('preview-open');
@@ -432,5 +563,7 @@
   populateLanguageOptions();
   renderFileButtons();
   selectFile(currentFile);
-  runPreview(false);
+  if (['HTML', 'CSS', 'JavaScript'].indexOf(getLanguageForFile(currentFile)) >= 0) {
+    runPreview(false);
+  }
 })();

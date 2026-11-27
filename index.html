@@ -17,7 +17,7 @@
       <div class="top-actions">
         <span class="save-status" id="saveStatus" role="status">Saved locally</span>
         <button class="icon-button download-button" id="downloadButton" type="button" aria-label="Download current file" title="Download current file">↓</button>
-        <button class="run-button" id="runButton" type="button" title="Run an HTML/CSS/JavaScript preview"><span aria-hidden="true">▶</span><span>Run</span></button>
+        <button class="run-button" id="runButton" type="button" title="Run Python or preview HTML, CSS, and JavaScript"><span aria-hidden="true">▶</span><span>Run</span></button>
       </div>
     </header>
 
@@ -31,7 +31,7 @@
         <div class="sidebar-heading"><span>EXPLORER</span><button class="small-icon-button" id="newFileButton" type="button" aria-label="New file" title="New file">＋</button></div>
         <button class="project-row" type="button"><span>⌄</span><strong>MY-PROJECT</strong></button>
         <div class="file-list" id="fileList" aria-label="Project files"></div>
-        <div class="sidebar-help">Choose a language below. Files save in this browser.<br>Run preview supports HTML, CSS, and JavaScript.</div>
+        <div class="sidebar-help">Choose a language below. Files save in this browser.<br>Run Python or preview HTML, CSS, and JavaScript.</div>
       </aside>
 
       <section class="editor-column" id="editorColumn" aria-label="Code editor">
@@ -45,11 +45,13 @@
       </section>
 
       <section class="preview-column" id="previewColumn" aria-label="Live preview">
-        <div class="preview-header"><span><i class="preview-dot"></i>PREVIEW</span><div class="preview-actions"><button class="mobile-code-button" id="backToEditorButton" type="button">‹ Code</button><button class="small-icon-button" id="refreshPreviewButton" type="button" title="Refresh preview" aria-label="Refresh preview">↻</button></div></div>
+        <div class="preview-header"><span><i class="preview-dot"></i><span id="previewTitle">PREVIEW</span></span><div class="preview-actions"><button class="mobile-code-button" id="backToEditorButton" type="button">‹ Code</button><button class="small-icon-button" id="refreshPreviewButton" type="button" title="Run again" aria-label="Run again">↻</button></div></div>
         <iframe id="previewFrame" title="Your project preview" sandbox="allow-scripts"></iframe>
+        <pre id="pythonOutput" class="python-output" role="log" aria-live="polite" hidden></pre>
       </section>
     </main>
 
+    <iframe id="pythonRunner" class="python-runner" title="Isolated Python runtime" sandbox="allow-scripts" aria-hidden="true" tabindex="-1"></iframe>
     <footer class="statusbar"><span><i class="statusbar-check">✓</i> Ready</span><span id="statusFile">index.html</span><span>Browser workspace</span></footer>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
