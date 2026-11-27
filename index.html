@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111318">
+  <meta name="description" content="A small, mobile-friendly code editor that runs in your browser.">
+  <title>PocketCode — mobile code editor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="icon-button menu-button" id="filesToggle" type="button" aria-label="Toggle files" aria-expanded="false">☰</button>
+      <a class="brand" href="#" aria-label="PocketCode home"><span class="brand-mark">&lt;/&gt;</span><span class="brand-name">Pocket<span>Code</span></span></a>
+      <div class="project-name"><span class="status-dot"></span><span>my-project</span></div>
+      <div class="top-actions">
+        <span class="save-status" id="saveStatus" role="status">Saved locally</span>
+        <button class="icon-button download-button" id="downloadButton" type="button" aria-label="Download current file" title="Download current file">↓</button>
+        <button class="run-button" id="runButton" type="button"><span aria-hidden="true">▶</span><span>Run</span></button>
+      </div>
+    </header>
+
+    <main class="workbench">
+      <aside class="activity-bar" aria-label="Tools">
+        <button class="activity-button selected" type="button" aria-label="Explorer" title="Explorer">▤</button>
+        <button class="activity-button" id="previewToggle" type="button" aria-label="Toggle preview" title="Preview">◫</button>
+      </aside>
+
+      <aside class="file-sidebar" id="fileSidebar">
+        <div class="sidebar-heading"><span>EXPLORER</span><button class="small-icon-button" id="newFileButton" type="button" aria-label="New file" title="New file">＋</button></div>
+        <button class="project-row" type="button"><span>⌄</span><strong>MY-PROJECT</strong></button>
+        <div class="file-list" id="fileList" aria-label="Project files"></div>
+        <div class="sidebar-help">Your files stay in this browser.<br>Download files to keep a copy.</div>
+      </aside>
+
+      <section class="editor-column" id="editorColumn" aria-label="Code editor">
+        <div class="tabs-bar"><div class="tabs" id="tabs" role="tablist" aria-label="Open files"></div><button class="small-icon-button editor-download" id="tabDownloadButton" type="button" aria-label="Download current file" title="Download current file">↓</button></div>
+        <div class="breadcrumb"><span>my-project</span><span class="breadcrumb-separator">›</span><strong id="currentFileLabel">index.html</strong><span class="breadcrumb-spacer"></span><button id="deleteFileButton" class="small-icon-button delete-button" type="button" title="Delete current file" aria-label="Delete current file">×</button></div>
+        <div class="editor" id="editor">
+          <div class="line-numbers" id="lineNumbers" aria-hidden="true">1</div>
+          <textarea id="codeInput" aria-label="Code editor" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" wrap="off" placeholder="Start typing code..."></textarea>
+        </div>
+        <div class="editor-footer"><span id="languageLabel">HTML</span><span>UTF-8</span><span>Spaces: 2</span><span id="cursorPosition">Ln 1, Col 1</span></div>
+      </section>
+
+      <section class="preview-column" id="previewColumn" aria-label="Live preview">
+        <div class="preview-header"><span><i class="preview-dot"></i>PREVIEW</span><div class="preview-actions"><button class="mobile-code-button" id="backToEditorButton" type="button">‹ Code</button><button class="small-icon-button" id="refreshPreviewButton" type="button" title="Refresh preview" aria-label="Refresh preview">↻</button></div></div>
+        <iframe id="previewFrame" title="Your project preview" sandbox="allow-scripts"></iframe>
+      </section>
+    </main>
+
+    <footer class="statusbar"><span><i class="statusbar-check">✓</i> Ready</span><span id="statusFile">index.html</span><span>Browser workspace</span></footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="JAVA.js"></script>
+</body>
+</html>
